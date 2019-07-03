@@ -2,8 +2,24 @@
 
 import os
 from termcolor import colored
+player_moves_list = []
 
-
+def input_check(input):
+    
+    if input.isdigit():
+        for x in range (len(input)):
+            if input[x] == "0":
+                return True
+        
+        if len(input) != 3:
+            return True
+        elif int(input) >= 111 and int(input) <= 999:
+            for x in range (len(input)):
+                player_moves_list.append(input[x])
+            return False
+    else:
+        return True
+     
 def clear():
     os.system('clear')
 
@@ -58,3 +74,19 @@ with open("test_grid.txt", "r") as grid_file:
         rows_file.append(line)
 
 print_grid(rows_file)
+
+input_loop = True
+
+while input_loop == True:
+    clear()
+    print_grid(rows_file)
+    output = ''
+    box = input("Please choose a box (1-9): ")
+    brancket = input("Please choose a bracket (1-9): ")
+    number = input("Please input a number(1-9): ")
+    output = str(box)+str(brancket)+str(number)
+    player_moves_list = []
+    input_loop = input_check(output)
+    print(player_moves_list)
+    print(input_loop)
+    input("dikmoree")
