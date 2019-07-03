@@ -1,6 +1,6 @@
-import os
 #!/usr/bin/env python3
 
+import os
 from termcolor import colored
 
 
@@ -8,9 +8,19 @@ def clear():
     os.system('clear')
 
 
+def make_yellow(anystring):
+    anystring = colored(anystring, "yellow", attrs=["bold"])
+    return anystring
+
+
 def print_grid(rows_file):
-    border_line = "-" * 37
-    print(colored(border_line, "yellow", attrs=["bold"]))
+
+    box_border = make_yellow("-" * 37)
+    line_border = make_yellow(":")
+    for i in range(3):
+        line_border += "-" * 11 + make_yellow(":")
+
+    print(box_border, " " * 12, )
     for j, num_row in enumerate(rows_file):
         row_list = []
         for num in num_row:
@@ -18,25 +28,25 @@ def print_grid(rows_file):
                 row_list.append(" ")
             else:
                 row_list.append(num)
-        row = colored("|", "yellow", attrs=["bold"])
+        row = make_yellow("|")
         for i, cell in enumerate(row_list):
             cell = colored(cell, "cyan", attrs=["bold"])
             if i % 3 == 2:
-                row += f" {cell} " + colored("|", "yellow", attrs=["bold"])
+                row += f" {cell} " + make_yellow("|")
             else:
                 row += f" {cell} |"
         print(row)
         if j % 3 == 2:
-            print(colored(border_line, "yellow", attrs=["bold"]))
+            print(box_border)
         else:
-            print(border_line)
+            print(line_border)
 
 
 clear()
 
 index_dict = {}
 
-for x in range (81):
+for x in range(81):
     row = x // 9
     column = x % 9
     box = 3 * (row // 3) + column // 3
