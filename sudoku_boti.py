@@ -122,7 +122,7 @@ def check_win(grid, *args):
 
 clear()
 
-# rows_default = generate_grid()
+# grid_default = generate_grid()
 # print_grid(rows_default, rows_default)
 
 grid_default = generate_grid()
