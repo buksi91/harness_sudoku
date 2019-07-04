@@ -13,34 +13,28 @@ def main():
     # grid_default = generate_grid("test_grid_failed.txt")
     grid = list(grid_default)
 
-    rows_default = get_rows(grid_default)
-    rows = list(rows_default)
-
     active_cell = 0
 
-    print_grid(rows_default, rows, active_cell)
+    print_grid(grid, grid_default, active_cell)
 
     while True:
-        step = step_or_fill(rows_default, rows, active_cell)
+
+        step = step_or_fill(grid, grid_default, active_cell)
+
         if not step.isdigit():
-            active_cell = make_step(active_cell, step, grid, rows_default, rows)
+            active_cell = make_step(step, grid, grid_default, active_cell)
         elif grid[active_cell] == " " or (grid[active_cell] != " " and grid[active_cell] != grid_default[active_cell]):
-            if step != "0":
-                grid[active_cell] = step
-            else:
-                grid[active_cell] = " "
-            rows = get_rows(grid)
+            grid = get_grid(step, grid, active_cell)
+
             clear()
-            print_grid(rows_default, rows, active_cell)
-            if not grid.count(" "):
-                columns = get_columns(grid)
-                boxes = get_boxes(grid)
-                win_status = check_win(rows, columns, boxes)
-                if win_status:
-                    break
+            print_grid(grid, grid_default, active_cell)
+
+            win_status = check_grid(grid)
+            if win_status:
+                break
         else:
             clear()
-            print_grid(rows_default, rows, active_cell)
+            print_grid(grid, grid_default, active_cell)
 
 
 def clear():
@@ -77,7 +71,10 @@ def color_active_empty_cell(anystring):
     return anystring
 
 
-def print_grid(rows_default, rows, active_cell):
+def print_grid(grid, grid_default, active_cell):
+
+    rows_default = get_rows(grid_default)
+    rows = get_rows(grid)
 
     rows_to_print = list(rows)
     box_border = color_box_border("-" * 37)
@@ -133,12 +130,12 @@ def generate_grid(filename="test_grid.txt"):
 
 
 def get_rows(grid):
-    rows = [[grid[j] for j in range(i, i + 9)] for i in range(0, 73, 9)]
+    rows = [[grid[9 * i + j] for j in range(9)] for i in range(9)]
     return rows
 
 
 def get_columns(grid):
-    columns = [[grid[j] for j in range(i, i + 73, 9)] for i in range(9)]
+    columns = [[grid[i + 9 * j] for j in range(9)] for i in range(9)]
     return columns
 
 
@@ -157,25 +154,30 @@ def get_boxes(grid):
     return boxes
 
 
-def step_or_fill(rows_default, rows, active_cell):
+def step_or_fill(grid, grid_default, active_cell):
     while True:
         print("Make a step:".rjust(13), "w/a/s/d")
         print("Make 3 steps:".rjust(13), "ww/aa/ss/dd (example: 'ww' - 3 steps up)")
         print("Fill a cell:".rjust(13), "1 - 9")
         print("Clear a cell:".rjust(13), "0\n")
         step = input("Your input: ")
+        if " " in step:
+            clear()
+            print_grid(grid, grid_default, active_cell)
+            continue
         if step.isdigit() and int(step) in range(0, 10):
             return step
         elif step in "wasd" and len(step) == 1:
             return step
-        elif step[0] in "wasd" and step[1] == step[0] and len(step) == 2:
-            return step
+        elif len(step) == 2:
+            if step[0] in "wasd" and step[1] == step[0]:
+                return step
         else:
             clear()
-            print_grid(rows_default, rows, active_cell)
+            print_grid(grid, grid_default, active_cell)
 
 
-def make_step(active_cell, step, grid, rows_default, rows):
+def make_step(step, grid, grid_default, active_cell):
     steps = {
         "w": (lambda c: c - 9), "ww": (lambda c: c - 27),
         "s": (lambda c: c + 9), "ss": (lambda c: c + 27),
@@ -186,12 +188,21 @@ def make_step(active_cell, step, grid, rows_default, rows):
     active_cell = steps[step](active_cell)
     if active_cell in range(81):
         clear()
-        print_grid(rows_default, rows, active_cell)
+        print_grid(grid, grid_default, active_cell)
         return active_cell
-    active_cell = int(active_cell_copy)
-    clear()
-    print_grid(rows_default, rows, active_cell)
-    return active_cell
+    else:
+        active_cell = int(active_cell_copy)
+        clear()
+        print_grid(grid, grid_default, active_cell)
+        return active_cell
+
+
+def get_grid(step, grid, active_cell):
+    if step != "0":
+        grid[active_cell] = step
+    else:
+        grid[active_cell] = " "
+    return grid
 
 
 def check_win(*args):
@@ -205,6 +216,16 @@ def check_win(*args):
         print("Top noice")
     else:
         print("Some numbers are in the wrong place. Try again!\n")
+    return win_status
+
+
+def check_grid(grid):
+    win_status = False
+    if not grid.count(" "):
+        rows = get_rows(grid)
+        columns = get_columns(grid)
+        boxes = get_boxes(grid)
+        win_status = check_win(rows, columns, boxes)
     return win_status
 
 
