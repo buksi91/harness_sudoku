@@ -161,10 +161,6 @@ def step_or_fill(grid, grid_default, active_cell):
         print("Fill a cell:".rjust(13), "1 - 9")
         print("Clear a cell:".rjust(13), "0\n")
         step = input("Your input: ")
-        if " " in step:
-            clear()
-            print_grid(grid, grid_default, active_cell)
-            continue
         if step.isdigit() and int(step) in range(0, 10):
             return step
         elif step in "wasd" and len(step) == 1:
@@ -172,9 +168,8 @@ def step_or_fill(grid, grid_default, active_cell):
         elif len(step) == 2:
             if step[0] in "wasd" and step[1] == step[0]:
                 return step
-        else:
-            clear()
-            print_grid(grid, grid_default, active_cell)
+        clear()
+        print_grid(grid, grid_default, active_cell)
 
 
 def make_step(step, grid, grid_default, active_cell):
