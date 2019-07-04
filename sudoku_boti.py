@@ -4,6 +4,36 @@ import os
 from termcolor import colored
 
 
+def main():
+
+    clear()
+
+    grid_default = generate_grid()
+    grid = list(grid_default)
+
+    rows_default = get_rows(grid_default)
+    rows = list(rows_default)
+
+    boxes = get_boxes(grid)
+
+    print_grid(rows_default, rows)
+
+    while True:
+
+        asd = input("Enter something, you filthy animal: ")
+        step_data = [6, 8, 4]
+        grid = get_grid(step_data, boxes, grid, grid_default)
+        rows = get_rows(grid)
+        boxes = get_boxes(grid)
+        clear()
+        print_grid(rows_default, rows)
+        if not grid.count(" "):
+            columns = get_columns(grid)
+            win_status = check_win(rows, columns, boxes)
+            if win_status:
+                break
+
+
 def clear():
     os.system('clear')
 
@@ -13,26 +43,16 @@ def make_it_yellow(anystring):
     return anystring
 
 
-def get_index_dict():
-    index_dict = {}
-    for x in range(81):
-        row = x // 9
-        column = x % 9
-        box = 3 * (row // 3) + column // 3
-        index_dict[x] = [row, column, box]
-    return index_dict
-
-
 def print_grid(rows_default, rows):
 
-    rows_printed = list(rows)
+    rows_to_print = list(rows)
     box_border = make_it_yellow("-" * 37)
     line_border = make_it_yellow(":")
     for i in range(3):
         line_border += "-" * 11 + make_it_yellow(":")
 
     print(box_border + " " * 12 + box_border)
-    for i, row in enumerate(rows_printed):
+    for i, row in enumerate(rows_to_print):
         row_printed = make_it_yellow("|")
         for j, cell in enumerate(row):
             if rows_default[i][j] == rows[i][j] and rows_default[i][j] != " ":
@@ -107,33 +127,33 @@ def get_boxes(grid):
     return boxes
 
 
-def check_win(grid, *args):
-    win = True
-    if not grid.count(" "):
-        for i in range(1, 10):
-            for arg in args:
-                for sequence in arg:
-                    if sequence.count(str(i)) > 1:
-                        win = False
-                        print("elbasztad")
-        if win:
-            print("nyertél köcsög")
+def get_index(box_num, box_index):
+    index = 27 * ((box_num - 1) // 3) + ((box_num - 1) % 3) * 3 + ((box_index - 1) // 3) * 9 + ((box_index - 1) % 3)
+    return index
 
 
-clear()
+def get_grid(step_data, boxes, grid, grid_default):
+    box_num = step_data[0]
+    box_index = step_data[1]
+    index = get_index(box_num, box_index)
+    if grid_default[index] == " ":
+        num = step_data[2]
+        grid[index] = num
+    return grid
 
-# grid_default = generate_grid()
-# print_grid(rows_default, rows_default)
 
-grid_default = generate_grid()
-grid_solved = generate_grid("test_grid_solved.txt")
+def check_win(*args):
+    win_status = True
+    for i in range(1, 10):
+        for arg in args:
+            for sequence in arg:
+                if sequence.count(str(i)) > 1:
+                    win_status = False
+    if win_status:
+        print("ebin")
+    else:
+        print("rekt")
+    return win_status
 
-rows_default = get_rows(grid_default)
-rows_solved = get_rows(grid_solved)
 
-columns_solved = get_columns(grid_solved)
-boxes_solved = get_boxes(grid_solved)
-
-print_grid(rows_default, rows_solved)
-
-check_win(grid_solved, rows_solved, columns_solved, boxes_solved)
+main()
