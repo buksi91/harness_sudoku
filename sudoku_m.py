@@ -4,22 +4,24 @@ import os
 from termcolor import colored
 player_moves_list = []
 
+
 def input_check(input):
-    
+
     if input.isdigit():
-        for x in range (len(input)):
+        for x in range(len(input)):
             if input[x] == "0":
                 return True
-        
+
         if len(input) != 3:
             return True
         elif int(input) >= 111 and int(input) <= 999:
-            for x in range (len(input)):
+            for x in range(len(input)):
                 player_moves_list.append(input[x])
             return False
     else:
         return True
-     
+
+
 def clear():
     os.system('clear')
 
@@ -77,7 +79,7 @@ print_grid(rows_file)
 
 input_loop = True
 
-while input_loop == True:
+while input_loop:
     clear()
     print_grid(rows_file)
     output = ''

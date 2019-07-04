@@ -20,8 +20,7 @@ def main():
 
     while True:
 
-        asd = input("Enter something, you filthy animal: ")
-        step_data = [6, 8, 4]
+        step_data = get_input(rows_default, rows)
         grid = get_grid(step_data, boxes, grid, grid_default)
         rows = get_rows(grid)
         boxes = get_boxes(grid)
@@ -38,37 +37,49 @@ def clear():
     os.system('clear')
 
 
-def make_it_yellow(anystring):
-    anystring = colored(anystring, "yellow", attrs=["bold"])
+def color_box_border(anystring):
+    anystring = colored(anystring, "white", attrs=["bold"])
+    return anystring
+
+
+def color_default_number(anystring):
+    anystring = colored(anystring, "white", attrs=["bold"])
+    return anystring
+
+
+def color_input_number(anystring):
+    anystring = colored(anystring, "green", attrs=["bold"])
     return anystring
 
 
 def print_grid(rows_default, rows):
 
     rows_to_print = list(rows)
-    box_border = make_it_yellow("-" * 37)
-    line_border = make_it_yellow(":")
+    box_border = color_box_border("-" * 37)
+    line_border = color_box_border(":")
     for i in range(3):
-        line_border += "-" * 11 + make_it_yellow(":")
+        line_border += "-" * 11 + color_box_border(":")
 
     print(box_border + " " * 12 + box_border)
     for i, row in enumerate(rows_to_print):
-        row_printed = make_it_yellow("|")
+        row_printed = color_box_border("|")
         for j, cell in enumerate(row):
             if rows_default[i][j] == rows[i][j] and rows_default[i][j] != " ":
-                cell = colored(cell, "cyan", attrs=["bold"])
+                cell = color_default_number(cell)
+            if rows_default[i][j] != rows[i][j] and rows[i][j] != " ":
+                cell = color_input_number(cell)
             if j % 3 == 2:
-                row_printed += f" {cell} " + make_it_yellow("|")
+                row_printed += f" {cell} " + color_box_border("|")
             else:
                 row_printed += f" {cell} |"
         if i % 3 == 1:
-            row_printed += " " * 12 + make_it_yellow("|")
+            row_printed += " " * 12 + color_box_border("|")
             for k in range(i, i + 3):
-                row_printed += str(k).center(11) + make_it_yellow("|")
+                row_printed += str(k).center(11) + color_box_border("|")
         else:
-            row_printed += " " * 12 + make_it_yellow("|")
+            row_printed += " " * 12 + color_box_border("|")
             for k in range(3):
-                row_printed += " " * 11 + make_it_yellow("|")
+                row_printed += " " * 11 + color_box_border("|")
         print(row_printed)
         if i % 3 == 2:
             print(box_border + " " * 12 + box_border)
@@ -127,8 +138,48 @@ def get_boxes(grid):
     return boxes
 
 
+def input_check(input, player_moves_list):
+
+    if input.isdigit():
+        for x in range(len(input)):
+            if input[x] == "0":
+                return True
+
+        if len(input) != 3:
+            return True
+        elif int(input) >= 111 and int(input) <= 999:
+            for x in range(len(input)):
+                player_moves_list.append(str(input[x]))
+            return False
+    else:
+        return True
+
+
+def get_input(rows_default, rows):
+    player_moves_list = []
+    input_loop = True
+    while input_loop:
+        clear()
+        print_grid(rows_default, rows)
+        output = ''
+        box = input("Please choose a box (1-9): ")
+        brancket = input("Please choose a cell (1-9): ")
+        number = input("Please enter a number (1-9): ")
+        output = str(box)+str(brancket)+str(number)
+        player_moves_list = []
+        input_loop = input_check(output, player_moves_list)
+        print(player_moves_list)
+        print(input_loop)
+        print("dikmoree")
+    return player_moves_list
+
+
 def get_index(box_num, box_index):
-    index = 27 * ((box_num - 1) // 3) + ((box_num - 1) % 3) * 3 + ((box_index - 1) // 3) * 9 + ((box_index - 1) % 3)
+    box_row = (int(box_num) - 1) // 3
+    box_column = (int(box_num) - 1) % 3
+    row_in_box = (int(box_index) - 1) // 3
+    column_in_box = (int(box_index) - 1) % 3
+    index = box_row * 27 + box_column * 3 + row_in_box * 9 + column_in_box
     return index
 
 
