@@ -9,6 +9,8 @@ def main():
     clear()
 
     grid_default = generate_grid()
+    # grid_default = generate_grid("test_grid_solved.txt")
+    # grid_default = generate_grid("test_grid_failed.txt")
     grid = list(grid_default)
 
     rows_default = get_rows(grid_default)
@@ -20,7 +22,7 @@ def main():
 
     while True:
 
-        step_data = get_input(rows_default, rows)
+        step_data = get_step_data(rows_default, rows)
         grid = get_grid(step_data, boxes, grid, grid_default)
         rows = get_rows(grid)
         boxes = get_boxes(grid)
@@ -139,39 +141,28 @@ def get_boxes(grid):
     return boxes
 
 
-def input_check(input, player_moves_list):
-
-    if input.isdigit():
-        for x in range(2):
-            if input[x] == "0":
-                return True
-        if len(input) != 3:
-            return True
-        elif int(input) >= 110 and int(input) <= 999:
-            for x in range(3):
-                player_moves_list.append(str(input[x]))
-            return False
-    else:
-        return True
+def check_input_validity(rows_default, rows, *args):
+    step_data = []
+    if all(len(x) == 1 for x in args):
+        input_chain = ""
+        for arg in args:
+            input_chain += arg
+        if input_chain.isdigit() and all(x != "0" for x in input_chain[:2]):
+            step_data = [x for x in input_chain]
+    return step_data
 
 
-def get_input(rows_default, rows):
-    player_moves_list = []
-    input_loop = True
-    while input_loop:
-        clear()
-        print_grid(rows_default, rows)
-        output = ''
+def get_step_data(rows_default, rows):
+    while True:
         box = input("Please choose a box (1-9): ")
-        brancket = input("Please choose a cell (1-9): ")
-        number = input("Please enter a number (1-9): ")
-        output = str(box)+str(brancket)+str(number)
-        player_moves_list = []
-        input_loop = input_check(output, player_moves_list)
-        print(player_moves_list)
-        print(input_loop)
-        print("dikmoree")
-    return player_moves_list
+        cell = input("Please choose a cell (1-9): ")
+        number = input("Please enter a number (1-9) or enter '0' to clear cell: ")
+        step_data = check_input_validity(rows_default, rows, box, cell, number)
+        if len(step_data):
+            return step_data
+        else:
+            clear()
+            print_grid(rows_default, rows)
 
 
 def get_index(box_num, box_index):
