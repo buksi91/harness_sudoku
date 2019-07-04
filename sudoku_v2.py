@@ -8,33 +8,41 @@ def main():
 
     clear()
 
-    grid_default = generate_grid()
-    # grid_default = generate_grid("test_grid_solved.txt")
-    # grid_default = generate_grid("test_grid_failed.txt")
+    grid_default = generate_grid()  # "test_grid_solved.txt" "test_grid_failed.txt"
     grid = list(grid_default)
+    active_index = 0
 
-    active_cell = 0
+    print_grid(grid, grid_default, active_index)
 
-    print_grid(grid, grid_default, active_cell)
+    grid_full = False
+    unsolved = True
+    while unsolved:
 
-    while True:
+        step = step_or_fill(grid, grid_default, active_index)
 
-        step = step_or_fill(grid, grid_default, active_cell)
-
-        if not step.isdigit():
-            active_cell = make_step(step, grid, grid_default, active_cell)
-        elif grid[active_cell] == " " or (grid[active_cell] != " " and grid[active_cell] != grid_default[active_cell]):
-            grid = get_grid(step, grid, active_cell)
-
-            clear()
-            print_grid(grid, grid_default, active_cell)
-
-            win_status = check_grid(grid)
-            if win_status:
-                break
+        if step.isdigit():
+            valid_cell = get_cell_validity(grid, grid_default, active_index)
+            if valid_cell:
+                grid = get_grid(step, grid, active_index)
+                grid_full = check_grid(grid)
         else:
-            clear()
-            print_grid(grid, grid_default, active_cell)
+            active_index = get_active_index(step, active_index)
+
+        clear()
+        print_grid(grid, grid_default, active_index)
+
+        if grid_full:
+            win_status = get_win_status(grid)
+            unsolved = get_unsolved(win_status)
+
+
+def get_cell_validity(grid, grid_default, active_index):
+    if grid[active_index] == " ":
+        return True
+    elif grid[active_index] != grid_default[active_index]:
+        return True
+    else:
+        return False
 
 
 def clear():
@@ -71,40 +79,47 @@ def color_active_empty_cell(anystring):
     return anystring
 
 
-def print_grid(grid, grid_default, active_cell):
+def color_the_cell(cell_value, default_value, cell_index, active_index):
+    if cell_value != " ":
+        if cell_value == default_value:
+            if cell_index == active_index:
+                return color_active_default_numbers(cell_value)
+            else:
+                return color_default_numbers(cell_value)
+        else:
+            if cell_index == active_index:
+                return color_active_input_numbers(cell_value)
+            else:
+                return color_input_numbers(cell_value)
+    elif cell_index == active_index:
+        return color_active_empty_cell(cell_value)
+    else:
+        return cell_value
 
-    rows_default = get_rows(grid_default)
+
+def print_grid(grid, grid_default, active_index):
+
     rows = get_rows(grid)
 
+    WIDTH = 37
     rows_to_print = list(rows)
-    box_border = color_box_border("-" * 37)
+    box_border = color_box_border("-" * WIDTH)
     line_border = color_box_border(":")
     for i in range(3):
         line_border += "-" * 11 + color_box_border(":")
 
     print(box_border)
     for i, row in enumerate(rows_to_print):
-        row_printed = color_box_border("|")
-        for j, cell in enumerate(row):
-
-            if rows_default[i][j] == rows[i][j] and rows_default[i][j] != " ":
-                if 9 * i + j != active_cell:
-                    cell = color_default_numbers(cell)
-                else:
-                    cell = color_active_default_numbers(cell)
-            if rows_default[i][j] != rows[i][j] and rows[i][j] != " ":
-                if 9 * i + j != active_cell:
-                    cell = color_input_numbers(cell)
-                else:
-                    cell = color_active_input_numbers(cell)
-            if rows[i][j] == " " and 9 * i + j == active_cell:
-                cell = color_active_empty_cell(cell)
-
+        row_to_print = color_box_border("|")
+        for j, cell_value in enumerate(row):
+            cell_index = 9 * i + j
+            default_value = grid_default[cell_index]
+            cell_value = color_the_cell(cell_value, default_value, cell_index, active_index)
             if j % 3 == 2:
-                row_printed += f" {cell} " + color_box_border("|")
+                row_to_print += f" {cell_value} " + color_box_border("|")
             else:
-                row_printed += f" {cell} |"
-        print(row_printed)
+                row_to_print += f" {cell_value} |"
+        print(row_to_print)
         if i % 3 == 2:
             if i == 8:
                 box_border += "\n"
@@ -154,74 +169,73 @@ def get_boxes(grid):
     return boxes
 
 
-def step_or_fill(grid, grid_default, active_cell):
+def step_or_fill(grid, grid_default, active_index):
+    JUST = 13
     while True:
-        print("Make a step:".rjust(13), "w/a/s/d")
-        print("Make 3 steps:".rjust(13), "ww/aa/ss/dd (example: 'ww' - 3 steps up)")
-        print("Fill a cell:".rjust(13), "1 - 9")
-        print("Clear a cell:".rjust(13), "0\n")
+        print("Make a step:".rjust(JUST), "w/a/s/d")
+        print("Make 3 steps:".rjust(JUST), "ww/aa/ss/dd (example: 'ww' - 3 steps up)")
+        print("Fill a cell:".rjust(JUST), "1 - 9")
+        print("Clear a cell:".rjust(JUST), "0\n")
         step = input("Your input: ")
+        step_keys = ["w", "a", "s", "d"]
         if step.isdigit() and int(step) in range(0, 10):
             return step
-        elif step in "wasd" and len(step) == 1:
+        elif step in step_keys or step in [x * 2 for x in step_keys]:
             return step
-        elif len(step) == 2:
-            if step[0] in "wasd" and step[1] == step[0]:
-                return step
-        clear()
-        print_grid(grid, grid_default, active_cell)
+        else:
+            clear()
+            print_grid(grid, grid_default, active_index)
 
 
-def make_step(step, grid, grid_default, active_cell):
+def get_active_index(step, active_index):
     steps = {
         "w": (lambda c: c - 9), "ww": (lambda c: c - 27),
         "s": (lambda c: c + 9), "ss": (lambda c: c + 27),
         "a": (lambda c: c - 1), "aa": (lambda c: c - 3),
         "d": (lambda c: c + 1), "dd": (lambda c: c + 3)
     }
-    active_cell_copy = int(active_cell)
-    active_cell = steps[step](active_cell)
-    if active_cell in range(81):
-        clear()
-        print_grid(grid, grid_default, active_cell)
-        return active_cell
-    else:
-        active_cell = int(active_cell_copy)
-        clear()
-        print_grid(grid, grid_default, active_cell)
-        return active_cell
+    active_index_copy = int(active_index)
+    active_index = steps[step](active_index)
+    if active_index not in range(81):
+        active_index = int(active_index_copy)
+    return active_index
 
 
-def get_grid(step, grid, active_cell):
+def get_grid(step, grid, active_index):
     if step != "0":
-        grid[active_cell] = step
+        grid[active_index] = step
     else:
-        grid[active_cell] = " "
+        grid[active_index] = " "
     return grid
 
 
-def check_win(*args):
+def check_grid(grid):
+    if grid.count(" "):
+        return False
+    else:
+        return True
+
+
+def get_win_status(grid):
+    rows = get_rows(grid)
+    columns = get_columns(grid)
+    boxes = get_boxes(grid)
     win_status = True
     for i in range(1, 10):
-        for arg in args:
-            for sequence in arg:
+        for sequence_type in [rows, columns, boxes]:
+            for sequence in sequence_type:
                 if sequence.count(str(i)) > 1:
                     win_status = False
+    return win_status
+
+
+def get_unsolved(win_status):
     if win_status:
         print("Top noice")
+        return False
     else:
         print("Some numbers are in the wrong place. Try again!\n")
-    return win_status
-
-
-def check_grid(grid):
-    win_status = False
-    if not grid.count(" "):
-        rows = get_rows(grid)
-        columns = get_columns(grid)
-        boxes = get_boxes(grid)
-        win_status = check_win(rows, columns, boxes)
-    return win_status
+        return True
 
 
 main()
