@@ -8,9 +8,9 @@ def main():
 
     clear()
 
-    # grid_default = generate_grid()
+    grid_default = generate_grid()
     # grid_default = generate_grid("test_grid_solved.txt")
-    grid_default = generate_grid("test_grid_failed.txt")
+    # grid_default = generate_grid("test_grid_failed.txt")
     grid = list(grid_default)
 
     rows_default = get_rows(grid_default)
@@ -133,22 +133,12 @@ def generate_grid(filename="test_grid.txt"):
 
 
 def get_rows(grid):
-    rows = []
-    for i in range(0, 73, 9):
-        row = []
-        for j in range(i, i + 9):
-            row.append(grid[j])
-        rows.append(row)
+    rows = [[grid[j] for j in range(i, i + 9)] for i in range(0, 73, 9)]
     return rows
 
 
 def get_columns(grid):
-    columns = []
-    for i in range(9):
-        column = []
-        for j in range(i, i + 73, 9):
-            column.append(grid[j])
-        columns.append(column)
+    columns = [[grid[j] for j in range(i, i + 73, 9)] for i in range(9)]
     return columns
 
 
