@@ -8,9 +8,9 @@ def main():
 
     clear()
 
-    grid_default = generate_grid()
+    # grid_default = generate_grid()
     # grid_default = generate_grid("test_grid_solved.txt")
-    # grid_default = generate_grid("test_grid_failed.txt")
+    grid_default = generate_grid("test_grid_failed.txt")
     grid = list(grid_default)
 
     rows_default = get_rows(grid_default)
@@ -195,9 +195,9 @@ def check_win(*args):
                 if sequence.count(str(i)) > 1:
                     win_status = False
     if win_status:
-        print("ebin")
+        print("Top noice")
     else:
-        print("rekt")
+        print("Some numbers are in the wrong place. Try again!\n")
     return win_status
 
 
