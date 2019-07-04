@@ -85,6 +85,7 @@ def print_grid(rows_default, rows):
             print(box_border + " " * 12 + box_border)
         else:
             print(line_border)
+    print()
 
 
 def generate_grid(filename="test_grid.txt"):
@@ -141,14 +142,13 @@ def get_boxes(grid):
 def input_check(input, player_moves_list):
 
     if input.isdigit():
-        for x in range(len(input)):
+        for x in range(2):
             if input[x] == "0":
                 return True
-
         if len(input) != 3:
             return True
-        elif int(input) >= 111 and int(input) <= 999:
-            for x in range(len(input)):
+        elif int(input) >= 110 and int(input) <= 999:
+            for x in range(3):
                 player_moves_list.append(str(input[x]))
             return False
     else:
@@ -186,10 +186,13 @@ def get_index(box_num, box_index):
 def get_grid(step_data, boxes, grid, grid_default):
     box_num = step_data[0]
     box_index = step_data[1]
+    num = step_data[2]
     index = get_index(box_num, box_index)
     if grid_default[index] == " ":
-        num = step_data[2]
-        grid[index] = num
+        if num != "0":
+            grid[index] = num
+        else:
+            grid[index] = " "
     return grid
 
 
